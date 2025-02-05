@@ -192,7 +192,7 @@ export default function App() {
 
                       <Pressable onPress={() =>onCloseModalZoomOut()}>
                         <Text style={{fontSize:20, fontWeight:'bold', color:'red'}}>
-                          FECHAR
+                          FECHA
                         </Text>
                       </Pressable>
 

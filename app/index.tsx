@@ -1,7 +1,7 @@
 import { Image, Pressable, Text, View } from "react-native";
-import MapView, { Callout, MapMarker, Marker, Polygon, Polyline, Region } from "react-native-maps";
+import MapView, { Callout, LatLng, MapMarker, Marker, Polygon, Polyline, Region } from "react-native-maps";
 import { styles } from "./styles";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/Modal";
 
 type Ponto = {
@@ -16,9 +16,14 @@ type Ponto = {
   };
 };
 
+type marcador = {
+  latitude: number
+  longitude: number
+}
+
 export default function App() {
 
-    const [clickedMarker, setClickedMarker] = useState<any>()
+    const [clickedMarker, setClickedMarker] = useState<marcador[]>([])
 
     const [modalVisible, setModalVisible] = useState(false)
 
@@ -40,6 +45,7 @@ export default function App() {
     function onMarkerClick(marker: Ponto){
       setSelectedMarker(marker)
       setModalVisible(true)
+      console.log(marker)
       mapRef.current?.animateCamera({
         center: { latitude:marker?.coordenadas.latitude, longitude: marker?.coordenadas.longitude},
         zoom: 19,
@@ -167,13 +173,23 @@ export default function App() {
           },
         },
       ];
-      
+
+
+      useEffect(()=>{
+          console.log("sako")
+      },[clickedMarker.length])
+
+
     return(
         <View style={styles.container}>
 
-            <View style={{paddingBottom:20, alignItems:'center'}}>
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ focusMap}>
+            <View style={{paddingBottom:20, alignItems:'center', flexDirection:'row'}}>
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(clickedMarker)}>
                     <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Press</Text>
+                </Pressable>
+
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() => setClickedMarker([])}>
+                  <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Limpar Lista</Text>
                 </Pressable>
             </View>
 
@@ -205,7 +221,9 @@ export default function App() {
             initialRegion={initialRegion}
             ref={mapRef}
             mapType="satellite"
-            onPress={(cord) => setClickedMarker(cord)}
+            onPress={(cord) => {              
+              setClickedMarker(...clickedMarker, cord.nativeEvent.coordinate)
+            }}
             >
             {lugaresImportantes.map((marker, index)=>
                     <Marker
@@ -215,6 +233,8 @@ export default function App() {
                         >
                     </Marker>
                 )}
+
+          
 
                 <Polygon
                 strokeColor="red"
@@ -251,9 +271,14 @@ export default function App() {
 
                   ]}                
                 />
-            
-                     
-               
+
+                <Polyline
+                  coordinates={clickedMarker}
+                  strokeColor="red"
+                  strokeWidth={3}
+                />
+              
+
             </MapView>
         </View>
     )

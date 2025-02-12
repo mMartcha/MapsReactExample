@@ -33,7 +33,7 @@ export default function App() {
 
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
 
-    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number>(Number)
+    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number[]>([])
 
     const mapRef = useRef<any>()
 
@@ -66,23 +66,42 @@ export default function App() {
       }, { duration: 1000 });
     }
 
-    function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    // function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    //   const R = 6371000; // Raio da Terra em metros
+    //   const toRad = (graus: number) => (graus * Math.PI) / 180;
+    
+    //   const dLat = toRad(lat2 - lat1);
+    //   const dLon = toRad(lon2 - lon1);
+    
+    //   const a =
+    //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    //     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    //   const teste = R * c // Retorna a distância em metros
+    //   return teste
+    // }
+
+     function calcularDistancia(coord1: marcador, coord2: marcador): number {
       const R = 6371000; // Raio da Terra em metros
       const toRad = (graus: number) => (graus * Math.PI) / 180;
     
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
+      const dLat = toRad(coord2.latitude - coord1.latitude);
+      const dLon = toRad(coord2.longitude - coord1.longitude);
     
       const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.cos(toRad(coord1.latitude)) * Math.cos(toRad(coord2.latitude)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
     
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     
       const teste = R * c // Retorna a distância em metros
-      return teste;
+      return teste
     }
+    
     
       const lugaresImportantes = [
         {
@@ -218,8 +237,7 @@ export default function App() {
                   <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Limpar Lista</Text>
                 </Pressable>
 
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() =>console.log(calcularDistancia(cordenada1.latitude, cordenada1.longitude,
-                                                                                                                  cordenada2.latitude, cordenada2.longitude))}>
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() =>console.log(calcularDistancia(cordenada1, cordenada2))}>
                   <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Medir distancia</Text>
                 </Pressable>
 

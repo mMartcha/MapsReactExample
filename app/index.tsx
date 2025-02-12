@@ -16,18 +16,24 @@ type Ponto = {
   };
 };
 
-type marcador = {
-  latitude: number
-  longitude: number
-}
+type marcador = 
+  {
+      latitude: number
+      longitude: number
+  }
+
+  
+
 
 export default function App() {
 
-    const [clickedMarker, setClickedMarker] = useState<marcador[]>([])
+    const [clickedMarker, setClickedMarker] = useState<any>([])
 
     const [modalVisible, setModalVisible] = useState(false)
 
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
+
+    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number>(Number)
 
     const mapRef = useRef<any>()
 
@@ -58,6 +64,24 @@ export default function App() {
         center: {latitude: initialRegion.latitude, longitude:initialRegion.longitude},
         zoom: 16,
       }, { duration: 1000 });
+    }
+
+    function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+      const R = 6371000; // Raio da Terra em metros
+      const toRad = (graus: number) => (graus * Math.PI) / 180;
+    
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+    
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+      const teste = R * c // Retorna a distância em metros
+      return teste;
     }
     
       const lugaresImportantes = [
@@ -174,9 +198,11 @@ export default function App() {
         },
       ];
 
+      let cordenada1 = clickedMarker[0]
+      let cordenada2 = clickedMarker[1]
 
       useEffect(()=>{
-          console.log("sako")
+          console.log("effect")
       },[clickedMarker.length])
 
 
@@ -184,13 +210,20 @@ export default function App() {
         <View style={styles.container}>
 
             <View style={{paddingBottom:20, alignItems:'center', flexDirection:'row'}}>
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(clickedMarker)}>
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(distanciaEmMetros)}>
                     <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Press</Text>
                 </Pressable>
 
                 <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() => setClickedMarker([])}>
                   <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Limpar Lista</Text>
                 </Pressable>
+
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() =>console.log(calcularDistancia(cordenada1.latitude, cordenada1.longitude,
+                                                                                                                  cordenada2.latitude, cordenada2.longitude))}>
+                  <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Medir distancia</Text>
+                </Pressable>
+
+
             </View>
 
                 <Modal
@@ -221,8 +254,9 @@ export default function App() {
             initialRegion={initialRegion}
             ref={mapRef}
             mapType="satellite"
-            onPress={(cord) => {              
-              setClickedMarker(...clickedMarker, cord.nativeEvent.coordinate)
+            onPress={(cord) => {    
+              let coordenadas = cord.nativeEvent.coordinate
+              setClickedMarker((prev: any) => [ ...prev, coordenadas])
             }}
             >
             {lugaresImportantes.map((marker, index)=>
@@ -233,8 +267,6 @@ export default function App() {
                         >
                     </Marker>
                 )}
-
-          
 
                 <Polygon
                 strokeColor="red"

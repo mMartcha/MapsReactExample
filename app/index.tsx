@@ -33,7 +33,9 @@ export default function App() {
 
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
 
-    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number[]>([])
+    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number[]>([0])
+
+    const [distanciaFinal, setDistanciaFinal] = useState<number>(0)
 
     const mapRef = useRef<any>()
 
@@ -66,26 +68,10 @@ export default function App() {
       }, { duration: 1000 });
     }
 
-    // function calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    //   const R = 6371000; // Raio da Terra em metros
-    //   const toRad = (graus: number) => (graus * Math.PI) / 180;
-    
-    //   const dLat = toRad(lat2 - lat1);
-    //   const dLon = toRad(lon2 - lon1);
-    
-    //   const a =
-    //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    //     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
-    //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    
-    //   const teste = R * c // Retorna a distância em metros
-    //   return teste
-    // }
+   
 
-     function calcularDistancia(coord1: marcador, coord2: marcador): number {
-      const R = 6371000; // Raio da Terra em metros
+     function calcularDistancia(coord1: marcador, coord2: marcador) {
+      const R = 6371000;
       const toRad = (graus: number) => (graus * Math.PI) / 180;
     
       const dLat = toRad(coord2.latitude - coord1.latitude);
@@ -98,10 +84,14 @@ export default function App() {
     
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     
-      const teste = R * c // Retorna a distância em metros
-      return teste
-    }
+      const dist = R * c 
+
+      setDistanciaFinal(dist)
+
+      console.log(dist.toFixed(1) + ' METROS')
+      console.log(distanciaFinal.toFixed(1) + ' distancia final')
     
+    }
     
       const lugaresImportantes = [
         {
@@ -217,30 +207,45 @@ export default function App() {
         },
       ];
 
-      let cordenada1 = clickedMarker[0]
-      let cordenada2 = clickedMarker[1]
+      let cordenada1: marcador
+      let cordenada2: marcador
 
+      const clickedMarkerLength = clickedMarker.length
+
+      if(clickedMarkerLength === 2){
+        cordenada1 = clickedMarker[0]
+        cordenada2 = clickedMarker[1]
+      }
+      else if(clickedMarkerLength > 2){
+        cordenada1 = clickedMarker[clickedMarkerLength - 2]
+        cordenada2 = clickedMarker[clickedMarkerLength - 1]
+      }
+      
+      
       useEffect(()=>{
-          console.log("effect")
-      },[clickedMarker.length])
+        if(clickedMarkerLength >= 2){
+            calcularDistancia(cordenada1, cordenada2)
+            }
+            },[clickedMarkerLength])
+
+      function limpar(){
+        setClickedMarker([])
+        setDistanciaFinal(0)
+        setDistanciaEmMetros([])
+      }
 
 
     return(
         <View style={styles.container}>
 
-            <View style={{paddingBottom:20, alignItems:'center', flexDirection:'row'}}>
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(distanciaEmMetros)}>
+            <View style={{paddingBottom:20, alignItems:'center', flexDirection:'row', justifyContent:'space-evenly'}}>
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(clickedMarker)}>
                     <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Press</Text>
                 </Pressable>
 
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() => setClickedMarker([])}>
+                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() => limpar()}>
                   <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Limpar Lista</Text>
                 </Pressable>
-
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() =>console.log(calcularDistancia(cordenada1, cordenada2))}>
-                  <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Medir distancia</Text>
-                </Pressable>
-
 
             </View>
 

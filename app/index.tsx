@@ -3,6 +3,7 @@ import MapView, { Callout, LatLng, MapMarker, Marker, Polygon, Polyline, Region 
 import { styles } from "./styles";
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/Modal";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 type Ponto = {
   nome: string;
@@ -22,18 +23,14 @@ type marcador =
       longitude: number
   }
 
-  
-
 
 export default function App() {
 
-    const [clickedMarker, setClickedMarker] = useState<any>([])
+    const [clickedMarker, setClickedMarker] = useState<marcador[]>([])
 
     const [modalVisible, setModalVisible] = useState(false)
 
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
-
-    const [distanciaEmMetros, setDistanciaEmMetros] = useState<number[]>([0])
 
     const [distanciaFinal, setDistanciaFinal] = useState<number>(0)
 
@@ -68,7 +65,6 @@ export default function App() {
       }, { duration: 1000 });
     }
 
-   
 
      function calcularDistancia(coord1: marcador, coord2: marcador) {
       const R = 6371000;
@@ -86,10 +82,11 @@ export default function App() {
     
       const dist = R * c 
 
-      setDistanciaFinal(dist)
-
+      const teste = distanciaFinal + dist
+      
       console.log(dist.toFixed(1) + ' METROS')
-      console.log(distanciaFinal.toFixed(1) + ' distancia final')
+      console.log(teste.toFixed(1) + ' DISTANCIA TOTAL')
+      setDistanciaFinal(distanciaFinal + dist)
     
     }
     
@@ -231,7 +228,6 @@ export default function App() {
       function limpar(){
         setClickedMarker([])
         setDistanciaFinal(0)
-        setDistanciaEmMetros([])
       }
 
 
@@ -239,12 +235,17 @@ export default function App() {
         <View style={styles.container}>
 
             <View style={{paddingBottom:20, alignItems:'center', flexDirection:'row', justifyContent:'space-evenly'}}>
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={ () => console.log(clickedMarker)}>
-                    <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Press</Text>
+
+                <Pressable style={{ backgroundColor:'#EB690B', borderRadius:8, padding:10}} onPress={ () => console.log(clickedMarker)}>
+                    <Text style={{fontSize:20, fontWeight:'bold', color:'black'}}>Press</Text>
                 </Pressable>
 
-                <Pressable style={{ backgroundColor:'red', borderRadius:8, padding:6}} onPress={() => limpar()}>
-                  <Text style={{fontSize:20, fontWeight:'bold', color:'white'}}>Limpar Lista</Text>
+                <Pressable style={{ backgroundColor:'#EB690B', borderRadius:8, padding:10}} onPress={ () => console.log(distanciaFinal)}>
+                  <FontAwesome name="arrows-h" size={24} color="black" />
+                </Pressable>
+
+                <Pressable style={{ backgroundColor:'#EB690B', borderRadius:8, padding:10}} onPress={() => limpar()}>
+                  <FontAwesome name="list-alt" size={24} color="black" />
                 </Pressable>
 
             </View>
@@ -287,6 +288,18 @@ export default function App() {
                         key={index}
                         coordinate={marker.coordenadas}  
                         onPress={() => onMarkerClick(marker)}
+                        pinColor="#EB690B"
+                        >
+                    </Marker>
+                )}
+
+                {clickedMarker.map((marker, index)=>
+                    <Marker
+                        key={index}
+                        coordinate={marker}  
+                        pinColor="#EB690B"
+                        icon={require("@/assets/images/dot.png")}
+                        anchor={{x:0.5,y:0.5}}
                         >
                     </Marker>
                 )}

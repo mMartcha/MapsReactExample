@@ -1,3 +1,4 @@
+import React from 'react'
 import { Image, Pressable, Text, View } from "react-native";
 import MapView, { Callout, LatLng, MapMarker, Marker, Polygon, Polyline, Region } from "react-native-maps";
 import { styles } from "./styles";
@@ -33,6 +34,8 @@ export default function App() {
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
 
     const [distanciaFinal, setDistanciaFinal] = useState<number>(0)
+
+    const [tempoTrajeto, setTempoTrajeto] = useState(Number)
 
     const mapRef = useRef<any>()
 
@@ -81,109 +84,80 @@ export default function App() {
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     
       const dist = R * c 
-
+      
       const teste = distanciaFinal + dist
       
       console.log(dist.toFixed(1) + ' METROS')
       console.log(teste.toFixed(1) + ' DISTANCIA TOTAL')
+      setTempoTrajeto(dist/1.5)
       setDistanciaFinal(distanciaFinal + dist)
-    
+      
     }
     
-      const lugaresImportantes = [
+    function formatarTempo(segundos: number){
+      if(segundos > 60){
+        const minutos = Math.floor(segundos / 60)
+        return `${minutos.toFixed(0)} minuto(s)`; 
+      } else {
+        return `${Math.floor(segundos)} segundo(s)`
+      }
+    }
+
+    function limpar(){
+      setClickedMarker([])
+      setDistanciaFinal(0)
+    }
+    const aa = {
+      0: [
+        {id: 1, path: [], dist: 2, time: 3},
+        {id: 2, path: [], dist: 2, time: 3}
+      ],
+      1: [
+        {id: 3, path: [], dist: 2, time: 3},
+        {id: 4, path: [], dist: 2, time: 3}
+      ]
+    }
+
+    const lugaresImportantes = [
+      {
+        nome: "Entrada",
+        descricao: "Entrada.",
+        id:'0',
+        coordenadas: {
+          latitude: -28.4739720,      
+          longitude: -52.813063,
+          latitudeDelta:0.01,
+          longitudeDelta:0.01
+      },
+      
+    },
+      {
+        nome: "PontoUm",
+        descricao: "PontoNoveDesc.",
+        id:'1',
+        coordenadas: {
+          latitude: -28.472847,       
+          longitude: -52.814130,
+          latitudeDelta:0.01,
+          longitudeDelta:0.01
+        },
+      },
         {
-          nome: "PontoUm",
+          nome: "PontoDois",
           descricao: "PontoUmDesc",
-          id:'1',
+          id:'2',
           coordenadas: {
             latitude: -28.472021,
             longitude: -52.814701,
             latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoDois",
-          descricao: "PontoDoisDesc",
-          id:'2',
-          coordenadas: {
-            latitude: -28.473709,
-            longitude: -52.814991,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "Associação",
-          descricao: "Palestras.",
-          id:'3',
-          coordenadas: {
-            latitude: -28.476016,
-            longitude: -52.817033,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-
+            longitudeDelta:0.01,
+                        
           },
         },
         {
           nome: "PontoTres",
-          descricao: "PontoTresDesc",
-          id:'4',
-          coordenadas: {
-            latitude: -28.479369,           
-            longitude: -52.815446,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoQuatro",
-          descricao: "PontoQuatroDesc",
-          id:'5',
-          coordenadas: {
-            latitude: -28.474851,          
-            longitude: -52.817930,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoCinco",
-          descricao: "PontoCincoDesc",
-          id:'6',
-          coordenadas: {
-            latitude: -28.474204,        
-            longitude: -52.818511,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoSeis",
-          descricao: "PontoSeisDesc.",
-          id:'7',
-          coordenadas: {
-            latitude: -28.473784,       
-            longitude: -52.816914,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoSete",
-          descricao: "PontoSeteDesc.",
-          id:'8',
-          coordenadas: {
-            latitude: -28.472689,        
-            longitude: -52.816372,
-            latitudeDelta:0.01,
-            longitudeDelta:0.01
-          },
-        },
-        {
-          nome: "PontoOito",
           descricao: "PontoOitoDesc.",
-          id:'9',
+          id:'3',
           coordenadas: {
             latitude: -28.473036,       
             longitude: -52.814999,
@@ -192,14 +166,81 @@ export default function App() {
           },
         },
         {
-          nome: "PontoNove",
-          descricao: "PontoNoveDesc.",
-          id:'10',
+          nome: "PontoQuatroN",
+          descricao: "PontoDoisDesc",
+          id:'4',
           coordenadas: {
-            latitude: -28.472847,       
-            longitude: -52.814130,
+            latitude: -28.473709,
+            longitude: -52.814991,
             latitudeDelta:0.01,
             longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "PontoCincoN",
+          descricao: "PontoSeteDesc.",
+          id:'5',
+          coordenadas: {
+            latitude: -28.472689,        
+            longitude: -52.816372,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "PontoSeis",
+          descricao: "PontoSeisDesc.",
+          id:'6',
+          coordenadas: {
+            latitude: -28.473784,       
+            longitude: -52.816914,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "PontoSeteN",
+          descricao: "PontoCincoDesc",
+          id:'7',
+          coordenadas: {
+            latitude: -28.474204,        
+            longitude: -52.818511,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "PontoOito",
+          descricao: "PontoQuatroDesc",
+          id:'8',
+          coordenadas: {
+            latitude: -28.474851,          
+            longitude: -52.817930,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "PontoNoveN",
+          descricao: "PontoTresDesc",
+          id:'9',
+          coordenadas: {
+            latitude: -28.479369,           
+            longitude: -52.815446,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+          },
+        },
+        {
+          nome: "Associação",
+          descricao: "Palestras.",
+          id:'10',
+          coordenadas: {
+            latitude: -28.476016,
+            longitude: -52.817033,
+            latitudeDelta:0.01,
+            longitudeDelta:0.01
+
           },
         },
       ];
@@ -218,18 +259,11 @@ export default function App() {
         cordenada2 = clickedMarker[clickedMarkerLength - 1]
       }
       
-      
       useEffect(()=>{
         if(clickedMarkerLength >= 2){
             calcularDistancia(cordenada1, cordenada2)
             }
             },[clickedMarkerLength])
-
-      function limpar(){
-        setClickedMarker([])
-        setDistanciaFinal(0)
-      }
-
 
     return(
         <View style={styles.container}>
@@ -240,9 +274,9 @@ export default function App() {
                     <Text style={{fontSize:20, fontWeight:'bold', color:'black'}}>Press</Text>
                 </Pressable>
 
-                <Pressable style={{ backgroundColor:'#EB690B', borderRadius:8, padding:10}} onPress={ () => console.log(distanciaFinal)}>
-                  <FontAwesome name="arrows-h" size={24} color="black" />
-                </Pressable>
+                <Text style={{fontSize:18, fontWeight:'bold'}}>
+                  {formatarTempo(tempoTrajeto)} 
+                </Text>
 
                 <Pressable style={{ backgroundColor:'#EB690B', borderRadius:8, padding:10}} onPress={() => limpar()}>
                   <FontAwesome name="list-alt" size={24} color="black" />
@@ -288,7 +322,12 @@ export default function App() {
                         key={index}
                         coordinate={marker.coordenadas}  
                         onPress={() => onMarkerClick(marker)}
+                        // onPress={(cord) => {    
+                        //   let coordenadas = cord.nativeEvent.coordinate
+                        //   setClickedMarker((prev: any) => [ ...prev, coordenadas])
+                        // }}
                         pinColor="#EB690B"
+                        
                         >
                     </Marker>
                 )}

@@ -1,3 +1,4 @@
+import React from "react"
 import { Modal as RNModal } from "react-native"
 
 import { View } from "react-native"

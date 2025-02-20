@@ -1,42 +1,28 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Image, Pressable, Text, View } from "react-native";
 import MapView, { Callout, LatLng, MapMarker, Marker, Polygon, Polyline, Region } from "react-native-maps";
 import { styles } from "./styles";
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "@/components/Modal";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
-type Ponto = {
-  nome: string;
-  descricao: string;
-  id: string;
-  coordenadas: {
-    latitude: number;
-    longitude: number;
-    latitudeDelta: number;
-    longitudeDelta: number;
-  };
-};
-
-type marcador = 
-  {
-      latitude: number
-      longitude: number
-  }
+import { entrePontos, MapContext, marcador, Ponto } from '@/context/MapContext';
 
 
 export default function App() {
 
     const [clickedMarker, setClickedMarker] = useState<marcador[]>([])
-
+        
     const [modalVisible, setModalVisible] = useState(false)
-
+        
     const [selectedMarker, setSelectedMarker] = useState<Ponto>()
-
+        
     const [distanciaFinal, setDistanciaFinal] = useState<number>(0)
-
+        
     const [tempoTrajeto, setTempoTrajeto] = useState(Number)
+    
+    const [listaDeCoords, setListaDeCoords] = useState<entrePontos[]>([])   
 
+      
     const mapRef = useRef<any>()
 
     const initialRegion = {
@@ -44,10 +30,6 @@ export default function App() {
         longitude:-52.815206,
         latitudeDelta:0.01,
         longitudeDelta:0.01
-    }
-
-    const focusMap = () => {
-        mapRef.current?.animateToRegion(initialRegion)
     }
 
     function onMarkerClick(marker: Ponto){
@@ -89,7 +71,7 @@ export default function App() {
       
       console.log(dist.toFixed(1) + ' METROS')
       console.log(teste.toFixed(1) + ' DISTANCIA TOTAL')
-      setTempoTrajeto(dist/1.5)
+      setTempoTrajeto(dist/1.35)
       setDistanciaFinal(distanciaFinal + dist)
       
     }
@@ -107,16 +89,24 @@ export default function App() {
       setClickedMarker([])
       setDistanciaFinal(0)
     }
-    const aa = {
-      0: [
-        {id: 1, path: [], dist: 2, time: 3},
-        {id: 2, path: [], dist: 2, time: 3}
-      ],
-      1: [
-        {id: 3, path: [], dist: 2, time: 3},
-        {id: 4, path: [], dist: 2, time: 3}
+    
+    const informacoesEntreTodos: entrePontos[] = [
+      {id: 0, paths: [
+        {idsTo: 0, dist: 0, time: 0, path:[{latitude:-28.473923, longitude: -52.813486}, {latitude:-28.473693, longitude: -52.813930}, {latitude:-28.473122, longitude: -52.813753 },{latitude: -28.472626, longitude: -52.813764 }]}
       ]
-    }
+      }
+       
+    ]
+
+
+      
+    
+      
+    
+      
+    
+     
+    
 
     const lugaresImportantes = [
       {
@@ -344,8 +334,8 @@ export default function App() {
                 )}
 
                 <Polygon
-                strokeColor="red"
-                strokeWidth={2}
+                strokeColor="#00bfff"
+                strokeWidth={3}
                   coordinates={[
                     {
                       latitude:-28.470762,
@@ -384,8 +374,12 @@ export default function App() {
                   strokeColor="red"
                   strokeWidth={3}
                 />
+                <Polyline
+                  coordinates={informacoesEntreTodos[0].paths[0].path}  
+                  strokeColor='purple'
+                  strokeWidth={3}              
+                />
               
-
             </MapView>
         </View>
     )
